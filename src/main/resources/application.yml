@@ -1,0 +1,4 @@
+es:
+  host: 120.79.176.54
+  port: 9200
+  scheme: http
