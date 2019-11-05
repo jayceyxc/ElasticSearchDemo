@@ -4,6 +4,8 @@ es:
   scheme: http
   socket_timeout: 60000
   connect_timeout: 60000
+  username: elastic
+  password: elastic
 
 logging:
   file:

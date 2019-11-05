@@ -2,6 +2,10 @@ package com.linus.es.demo.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -42,9 +46,28 @@ public class ElasticConfig {
     @Value("${es.connect_timeout}")
     public int connectTimeout;
 
+    /**
+     * 单位ms
+     */
+    @Value("${es.username}")
+    public String userName;
+
+    /**
+     * 单位ms
+     */
+    @Value("${es.password}")
+    public String password;
+
     @Bean
     public RestClientBuilder restClientBuilder() {
-        log.info("配置信息：socket timeout: {}, connect timeout: {}", socketTimeout, connectTimeout);
+        // 用户名密码授权 https://www.elastic.co/guide/en/elasticsearch/client/java-rest/master/_basic_authentication.html
+        final CredentialsProvider credentialsProvider =
+                new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY,
+                new UsernamePasswordCredentials(userName, password));
+
+        log.info("配置信息：socket timeout: {}, connect timeout: {}, user name: {}, password: {}",
+                socketTimeout, connectTimeout, userName, password);
         RestClientBuilder builder = RestClient.builder(makeHttpHost());
         builder.setRequestConfigCallback(requestConfigBuilder -> {
             requestConfigBuilder.setSocketTimeout(socketTimeout);
@@ -52,7 +75,12 @@ public class ElasticConfig {
 
             return requestConfigBuilder;
         });
-        builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36"));
+        builder.setHttpClientConfigCallback(httpClientBuilder -> {
+            httpClientBuilder.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36");
+            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            return httpClientBuilder;
+        });
+
         return builder;
     }
 
@@ -61,7 +89,7 @@ public class ElasticConfig {
     }
 
     @Bean
-    public RestHighLevelClient restHighLevelClient(@Autowired RestClientBuilder restClientBuilder){
+    public RestHighLevelClient restHighLevelClient(@Autowired RestClientBuilder restClientBuilder) {
         return new RestHighLevelClient(restClientBuilder);
     }
 }

@@ -6,6 +6,7 @@ import com.linus.es.demo.response.ResponseCode;
 import com.linus.es.demo.response.ResponseResult;
 import com.linus.es.demo.vo.IndexVO;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.client.indices.GetMappingsResponse;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,14 @@ public class ElasticIndexController {
                 response.setMsg(ResponseCode.RESOURCE_NOT_EXIST.getMsg());
             } else {
                 log.info("index={}, 已存在", index);
+            }
+        } catch (ElasticsearchStatusException ese) {
+
+            if (ese.status().getStatus() == 401) {
+                log.error(ese.status().name(), ese);
+                response.setCode(ese.status().getStatus());
+                response.setMsg(ese.getCause().getMessage());
+                response.setStatus(false);
             }
         } catch (Exception e) {
             response.setCode(ResponseCode.NETWORK_ERROR.getCode());
