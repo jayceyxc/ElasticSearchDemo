@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.indices.GetMappingsResponse;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -40,7 +39,11 @@ public class ElasticIndexController {
         ResponseResult response = new ResponseResult();
         String idxSql = JSONObject.toJSONString(idxVo.getIndexSql());
         log.warn(" indexName={}, indexSql={}",idxVo.getIndexName(),idxSql);
-        baseElasticDao.createIndex(idxVo.getIndexName(),idxSql);
+        boolean result = baseElasticDao.createIndex(idxVo.getIndexName(),idxSql);
+        if (!result) {
+            response.setCode(ResponseCode.FAILED.getCode());
+            response.setMsg(ResponseCode.FAILED.getMsg());
+        }
         return response;
     }
 
@@ -49,10 +52,12 @@ public class ElasticIndexController {
     public ResponseResult indexExist(@PathVariable(value = "index") String index){
         ResponseResult response = new ResponseResult();
         try {
-            if(!baseElasticDao.indexExist(index)){
-                log.error("index={},不存在",index);
+            if(!baseElasticDao.indexExist(index)) {
+                log.error("index={},不存在", index);
                 response.setCode(ResponseCode.RESOURCE_NOT_EXIST.getCode());
                 response.setMsg(ResponseCode.RESOURCE_NOT_EXIST.getMsg());
+            } else {
+                log.info("index={}, 已存在", index);
             }
         } catch (Exception e) {
             response.setCode(ResponseCode.NETWORK_ERROR.getCode());

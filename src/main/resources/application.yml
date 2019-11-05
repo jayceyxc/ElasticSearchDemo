@@ -2,3 +2,9 @@ es:
   host: 120.79.176.54
   port: 9200
   scheme: http
+  socket_timeout: 60000
+  connect_timeout: 60000
+
+logging:
+  file:
+    path: ./logs/

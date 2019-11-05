@@ -4,17 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.linus.es.demo.entity.ElasticEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -24,7 +21,6 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.VersionType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.rest.RestStatus;
@@ -58,13 +54,12 @@ public class BaseElasticDao {
      * @param indexName 索引名称
      * @param indexMapping 索引描述
      */
-    public void createIndex(String indexName, String indexMapping) {
+    public boolean createIndex(String indexName, String indexMapping) {
         try {
-
             boolean result = this.indexExist(indexName);
             if (result) {
                 log.error(" indexName={} 已经存在,indexSql={}",indexName,indexMapping);
-                return;
+                return true;
             }
             CreateIndexRequest request = new CreateIndexRequest(indexName);
             buildSetting(request);
@@ -76,7 +71,7 @@ public class BaseElasticDao {
             request.setMasterTimeout(TimeValue.timeValueMinutes(1));
 
             //在创建索引API返回响应之前等待的活动分片副本的数量，以ActiveShardCount形式表示。
-            request.waitForActiveShards(ActiveShardCount.from(2));
+//            request.waitForActiveShards(ActiveShardCount.from(2));
             //request.waitForActiveShards(ActiveShardCount.DEFAULT);
 
             request.mapping(indexMapping, XContentType.JSON);
@@ -84,8 +79,10 @@ public class BaseElasticDao {
             CreateIndexResponse res = restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
             // 返回的CreateIndexResponse允许检索有关执行的操作的信息
             if (!res.isAcknowledged() || !res.isShardsAcknowledged()) {
-                throw new RuntimeException("初始化失败");
+                log.error("创建索引失败：{}", indexName);
+                return false;
             }
+            return true;
             // 异步执行
             //异步执行创建索引请求需要将CreateIndexRequest实例和ActionListener实例传递给异步方法：
             //CreateIndexResponse的典型监听器如下所示：
@@ -112,7 +109,7 @@ public class BaseElasticDao {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.exit(0);
+            return false;
         }
     }
 
