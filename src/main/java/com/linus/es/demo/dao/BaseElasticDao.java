@@ -326,4 +326,26 @@ public class BaseElasticDao {
         }
     }
 
+    /**
+     * 查询
+     * @param idxName 索引名称
+     * @param builder 查询参数
+     * @return
+     */
+    public String search(String idxName, SearchSourceBuilder builder) {
+        SearchRequest request = new SearchRequest(idxName);
+        request.source(builder);
+        try {
+            SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+            log.info("total hits: {}", response.getHits().getTotalHits().value);
+            SearchHit[] hits = response.getHits().getHits();
+            for (SearchHit hit : hits) {
+                log.info(JSON.toJSONString(hit.getSourceAsMap()));
+            }
+            return JSON.toJSONString(hits);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

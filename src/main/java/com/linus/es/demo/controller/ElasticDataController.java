@@ -7,6 +7,7 @@ import com.linus.es.demo.response.ResponseResult;
 import com.linus.es.demo.utils.ElasticUtil;
 import com.linus.es.demo.vo.ElasticDataVO;
 import com.linus.es.demo.vo.QueryVO;
+import com.linus.es.demo.vo.SearchVO;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.index.query.MatchQueryBuilder;
@@ -103,6 +104,32 @@ public class ElasticDataController {
             response.setMsg("服务忙，请稍后再试");
             response.setStatus(false);
             log.error("查询数据异常，metadataVo={},异常信息={}", id, e.getMessage());
+        }
+        return response;
+    }
+
+    @RequestMapping(value = "/search",method = RequestMethod.GET)
+    public ResponseResult search(@RequestBody SearchVO searchVO){
+        log.info("enter search");
+        ResponseResult<String> response = new ResponseResult<>();
+        try {
+            Map<String,Object> params = searchVO.getQuery().get("match");
+            Set<String> keys = params.keySet();
+            MatchQueryBuilder queryBuilders=null;
+            for(String ke:keys){
+                queryBuilders = QueryBuilders.matchQuery(ke, params.get(ke));
+            }
+
+            if(null!=queryBuilders){
+                SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilders);
+                String result = baseElasticDao.search(searchVO.getIndexName(),searchSourceBuilder);
+                response.setData(result);
+            }
+        } catch (Exception e) {
+            response.setCode(ResponseCode.ERROR.getCode());
+            response.setMsg("服务忙，请稍后再试");
+            response.setStatus(false);
+            log.error("查询数据异常，metadataVo={},异常信息={}", searchVO.toString(),e.getMessage());
         }
         return response;
     }
