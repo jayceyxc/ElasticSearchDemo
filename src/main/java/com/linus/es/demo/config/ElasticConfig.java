@@ -47,13 +47,13 @@ public class ElasticConfig {
     public int connectTimeout;
 
     /**
-     * 单位ms
+     * ElasticSearch用户名
      */
     @Value("${es.username}")
     public String userName;
 
     /**
-     * 单位ms
+     * ElasticSearch密码
      */
     @Value("${es.password}")
     public String password;

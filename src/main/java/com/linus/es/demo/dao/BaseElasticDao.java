@@ -10,6 +10,8 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.MultiSearchRequest;
+import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.IndicesOptions;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -340,6 +343,7 @@ public class BaseElasticDao {
             log.info("total hits: {}", response.getHits().getTotalHits().value);
             SearchHit[] hits = response.getHits().getHits();
             for (SearchHit hit : hits) {
+                log.info("评分：{}", hit.getScore());
                 log.info(JSON.toJSONString(hit.getSourceAsMap()));
             }
             return JSON.toJSONString(hits);
@@ -348,4 +352,37 @@ public class BaseElasticDao {
         }
     }
 
+    /**
+     * 多条件查询
+     * @param idxName 索引名称
+     * @param sourceBuilderList 查询参数列表
+     * @return
+     */
+    public String search(String idxName, List<SearchSourceBuilder> sourceBuilderList) {
+        MultiSearchRequest multiSearchRequest = new MultiSearchRequest();
+        for (SearchSourceBuilder sourceBuilder : sourceBuilderList) {
+            SearchRequest request = new SearchRequest(idxName);
+            request.source(sourceBuilder);
+            multiSearchRequest.add(request);
+        }
+        try {
+            List<SearchHit> result = new ArrayList<>();
+            MultiSearchResponse multiResponse = restHighLevelClient.msearch(multiSearchRequest, RequestOptions.DEFAULT);
+            for (Iterator<MultiSearchResponse.Item> it = multiResponse.iterator(); it.hasNext(); ) {
+                MultiSearchResponse.Item item = it.next();
+                if (item.getFailure() != null) {
+                    SearchResponse response = item.getResponse();
+                    log.info("total hits: {}", response.getHits().getTotalHits().value);
+                    SearchHit[] hits = response.getHits().getHits();
+                    for (SearchHit hit : hits) {
+                        log.info(JSON.toJSONString(hit.getSourceAsMap()));
+                        result.add(hit);
+                    }
+                }
+            }
+            return JSON.toJSONString(result);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

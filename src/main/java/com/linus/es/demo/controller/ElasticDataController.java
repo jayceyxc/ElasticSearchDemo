@@ -10,15 +10,13 @@ import com.linus.es.demo.vo.QueryVO;
 import com.linus.es.demo.vo.SearchVO;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author yuxuecheng
@@ -31,6 +29,19 @@ import java.util.Set;
 @RequestMapping("/elasticData/")
 @RestController
 public class ElasticDataController {
+
+    /**
+     * ElasticSearch查询时返回结果的最小评分
+     */
+    @Value("${es.min_score}")
+    public float minScore;
+
+    /**
+     * ElasticSearch查询最大超时时间，单位ms
+     */
+    @Value("${es.search_timeout}")
+    public int searchTimeout;
+
     @Autowired
     private BaseElasticDao baseElasticDao;
 
@@ -66,7 +77,7 @@ public class ElasticDataController {
             }
 
             if(null!=queryBuilders){
-                SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilders);
+                SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilders, 0, 10);
                 List<?> data = baseElasticDao.search(queryVo.getIndexName(),searchSourceBuilder,clazz);
                 response.setData(data);
             }
@@ -113,15 +124,9 @@ public class ElasticDataController {
         log.info("enter search");
         ResponseResult<String> response = new ResponseResult<>();
         try {
-            Map<String,Object> params = searchVO.getQuery().get("match");
-            Set<String> keys = params.keySet();
-            MatchQueryBuilder queryBuilders=null;
-            for(String ke:keys){
-                queryBuilders = QueryBuilders.matchQuery(ke, params.get(ke));
-            }
-
-            if(null!=queryBuilders){
-                SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilders);
+            QueryBuilder queryBuilder = ElasticUtil.parseQuery(searchVO.getQuery());
+            if(null!=queryBuilder){
+                SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilder, 0, 10, searchTimeout, minScore);
                 String result = baseElasticDao.search(searchVO.getIndexName(),searchSourceBuilder);
                 response.setData(result);
             }

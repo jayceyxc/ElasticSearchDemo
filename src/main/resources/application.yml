@@ -2,8 +2,14 @@ es:
   host: 120.79.176.54
   port: 9200
   scheme: http
+  # 单位ms
   socket_timeout: 60000
+  # 单位ms
   connect_timeout: 60000
+  # 单位ms
+  search_timeout: 2000
+  # 返回文档的最低评分
+  min_score: 0.5
   username: elastic
   password: elastic
 
