@@ -33,10 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author yuxuecheng
@@ -341,12 +338,14 @@ public class BaseElasticDao {
         try {
             SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
             log.info("total hits: {}", response.getHits().getTotalHits().value);
+            List<Map<String, Object>> returnResult = new ArrayList<>();
             SearchHit[] hits = response.getHits().getHits();
             for (SearchHit hit : hits) {
                 log.info("评分：{}", hit.getScore());
                 log.info(JSON.toJSONString(hit.getSourceAsMap()));
+                returnResult.add(hit.getSourceAsMap());
             }
-            return JSON.toJSONString(hits);
+            return JSON.toJSONString(returnResult);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

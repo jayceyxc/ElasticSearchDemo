@@ -8,6 +8,7 @@ import com.linus.es.demo.utils.ElasticUtil;
 import com.linus.es.demo.vo.ElasticDataVO;
 import com.linus.es.demo.vo.QueryVO;
 import com.linus.es.demo.vo.SearchVO;
+import com.linus.es.demo.vo.SimpleStringSearchVO;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.index.query.*;
@@ -135,6 +136,24 @@ public class ElasticDataController {
             response.setMsg("服务忙，请稍后再试");
             response.setStatus(false);
             log.error("查询数据异常，metadataVo={},异常信息={}", searchVO.toString(),e.getMessage());
+        }
+        return response;
+    }
+
+    @RequestMapping(value = "/simple_search",method = RequestMethod.GET)
+    public ResponseResult simpleSearch(@RequestBody SimpleStringSearchVO simpleStringSearchVO){
+        log.info("enter search");
+        ResponseResult<String> response = new ResponseResult<>();
+        try {
+            QueryBuilder queryBuilder = QueryBuilders.simpleQueryStringQuery(simpleStringSearchVO.getQuery());
+            SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilder, 0, 10, searchTimeout, minScore);
+            String result = baseElasticDao.search(simpleStringSearchVO.getIndexName(),searchSourceBuilder);
+            response.setData(result);
+        } catch (Exception e) {
+            response.setCode(ResponseCode.ERROR.getCode());
+            response.setMsg("服务忙，请稍后再试");
+            response.setStatus(false);
+            log.error("查询数据异常，metadataVo={},异常信息={}", simpleStringSearchVO.toString(),e.getMessage());
         }
         return response;
     }

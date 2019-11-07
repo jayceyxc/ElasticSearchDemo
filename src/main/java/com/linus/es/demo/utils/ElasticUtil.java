@@ -1,10 +1,12 @@
 package com.linus.es.demo.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.lucene.queries.CommonTermsQuery;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +42,9 @@ public class ElasticUtil {
                 if (matchValue instanceof LinkedHashMap) {
                     LinkedHashMap<String, Object> matchQueryMap = (LinkedHashMap<String, Object>)matchValue;
                     for (Map.Entry<String, Object> entry : matchQueryMap.entrySet()) {
-                        queryBuilderList.add(QueryBuilders.matchQuery(entry.getKey(), entry.getValue()));
+                        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(entry.getKey(), entry.getValue());
+                        matchQueryBuilder.operator(Operator.OR);
+                        queryBuilderList.add(matchQueryBuilder);
                     }
                 }
             } else if (TermQueryBuilder.NAME.equalsIgnoreCase(innerKey)) {
@@ -158,8 +162,12 @@ public class ElasticUtil {
             if (matchParams != null) {
                 Set<String> keys = matchParams.keySet();
                 MatchQueryBuilder queryBuilders = null;
-                for (String ke : keys) {
-                    queryBuilders = QueryBuilders.matchQuery(ke, matchParams.get(ke));
+                for (String key : keys) {
+                    MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, matchParams.get(key));
+                    // 这里AND和OR的区别是：AND要求查询记录符合查询字符串分词后所得的所有词语，OR则只需要符合任何一个即可。
+//                    matchQueryBuilder.operator(Operator.OR);
+                    matchQueryBuilder.operator(Operator.AND);
+                    queryBuilders = matchQueryBuilder;
                 }
                 queryBuilder = queryBuilders;
             }
@@ -231,6 +239,7 @@ public class ElasticUtil {
         }
         sourceBuilder.highlighter(highlightBuilder);
         sourceBuilder.timeout(new TimeValue(timeout, TimeUnit.MILLISECONDS));
+        sourceBuilder.sort("_score", SortOrder.ASC);
         return sourceBuilder;
     }
 
