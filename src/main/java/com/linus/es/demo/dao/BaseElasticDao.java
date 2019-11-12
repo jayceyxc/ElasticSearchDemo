@@ -5,7 +5,9 @@ import com.linus.es.demo.entity.ElasticEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -30,6 +32,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -44,6 +47,7 @@ import java.util.*;
  */
 @Slf4j
 @Component
+@Order(value = 1)
 public class BaseElasticDao {
 
     @Autowired
@@ -165,13 +169,15 @@ public class BaseElasticDao {
     public void insertOrUpdateOne(String idxName, ElasticEntity entity) {
 
         IndexRequest request = new IndexRequest(idxName);
-        log.error("Data : id={},entity={}",entity.getId(), JSON.toJSONString(entity.getData()));
+        log.info("Data : id={},entity={}",entity.getId(), JSON.toJSONString(entity.getData()));
         request.id(entity.getId());
         request.source(JSON.toJSONString(entity.getData()), XContentType.JSON);
         try {
             restHighLevelClient.index(request, RequestOptions.DEFAULT);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (ElasticsearchException ee) {
+            log.error("数据插入失败", ee);
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
         }
     }
 
@@ -186,9 +192,15 @@ public class BaseElasticDao {
         list.forEach(item -> request.add(new IndexRequest(idxName).id(item.getId())
                 .source(JSON.toJSONString(item.getData()), XContentType.JSON)));
         try {
-            restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            BulkResponse bulkResponse = restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            for (BulkItemResponse response : bulkResponse) {
+                log.info(response.getFailureMessage());
+                log.info(response.getId());
+            }
+        } catch (ElasticsearchException ee) {
+            log.error("数据插入失败", ee);
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
         }
     }
 
@@ -204,8 +216,10 @@ public class BaseElasticDao {
         idList.forEach(item -> request.add(new DeleteRequest(idxName, item.toString())));
         try {
             restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (ElasticsearchException ee) {
+            log.error("数据插入失败", ee);
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
         }
     }
 
@@ -253,8 +267,10 @@ public class BaseElasticDao {
         request.setConflicts("proceed");
         try {
             restHighLevelClient.deleteByQuery(request, RequestOptions.DEFAULT);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (ElasticsearchException ee) {
+            log.error("数据删除失败", ee);
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
         }
     }
 
@@ -321,9 +337,12 @@ public class BaseElasticDao {
                 res.add(JSON.parseObject(hit.getSourceAsString(), c));
             }
             return res;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (ElasticsearchException ee) {
+            log.error("数据搜索失败", ee);
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
         }
+        return null;
     }
 
     /**
@@ -346,9 +365,13 @@ public class BaseElasticDao {
                 returnResult.add(hit.getSourceAsMap());
             }
             return JSON.toJSONString(returnResult);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (ElasticsearchException ee) {
+            log.error("数据搜索失败", ee);
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
         }
+
+        return null;
     }
 
     /**
@@ -380,8 +403,12 @@ public class BaseElasticDao {
                 }
             }
             return JSON.toJSONString(result);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (ElasticsearchException ee) {
+            log.error("数据搜索失败", ee);
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
         }
+
+        return null;
     }
 }

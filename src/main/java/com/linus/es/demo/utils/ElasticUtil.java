@@ -1,7 +1,6 @@
 package com.linus.es.demo.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.lucene.queries.CommonTermsQuery;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -43,7 +42,7 @@ public class ElasticUtil {
                     LinkedHashMap<String, Object> matchQueryMap = (LinkedHashMap<String, Object>)matchValue;
                     for (Map.Entry<String, Object> entry : matchQueryMap.entrySet()) {
                         MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(entry.getKey(), entry.getValue());
-                        matchQueryBuilder.operator(Operator.OR);
+                        matchQueryBuilder.operator(Operator.AND);
                         queryBuilderList.add(matchQueryBuilder);
                     }
                 }
@@ -202,7 +201,7 @@ public class ElasticUtil {
      */
     public static SearchSourceBuilder initSearchSourceBuilder(QueryBuilder queryBuilder, int from, int size, int timeout,
                                                               float minScore) {
-        return initSearchSourceBuilder(queryBuilder, from, size, timeout, minScore, null);
+        return initSearchSourceBuilder(queryBuilder, from, size, timeout, minScore, Arrays.asList("demography_xm", "zyks", "zzys"));
     }
 
     /**
