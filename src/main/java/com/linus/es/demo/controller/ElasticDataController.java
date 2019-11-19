@@ -79,7 +79,7 @@ public class ElasticDataController {
 
             if(null!=queryBuilders){
                 SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilders, 0, 10);
-                List<?> data = baseElasticDao.search(queryVo.getIndexName(),searchSourceBuilder,clazz);
+                List<?> data = baseElasticDao.searchReturnHits(queryVo.getIndexName(),searchSourceBuilder,clazz);
                 response.setData(data);
             }
         } catch (Exception e) {
@@ -128,7 +128,7 @@ public class ElasticDataController {
             QueryBuilder queryBuilder = ElasticUtil.parseQuery(searchVO.getQuery());
             if(null!=queryBuilder){
                 SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilder, 0, 10, searchTimeout, minScore);
-                String result = baseElasticDao.search(searchVO.getIndexName(),searchSourceBuilder);
+                String result = baseElasticDao.searchReturnHits(searchVO.getIndexName(),searchSourceBuilder);
                 response.setData(result);
             }
         } catch (Exception e) {
@@ -147,7 +147,7 @@ public class ElasticDataController {
         try {
             QueryBuilder queryBuilder = QueryBuilders.simpleQueryStringQuery(simpleStringSearchVO.getQuery());
             SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilder, 0, 10, searchTimeout, minScore);
-            String result = baseElasticDao.search(simpleStringSearchVO.getIndexName(),searchSourceBuilder);
+            String result = baseElasticDao.searchReturnHits(simpleStringSearchVO.getIndexName(),searchSourceBuilder);
             response.setData(result);
         } catch (Exception e) {
             response.setCode(ResponseCode.ERROR.getCode());

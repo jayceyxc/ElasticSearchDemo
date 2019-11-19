@@ -199,7 +199,7 @@ public class ImportDataToEsFromExcel implements CommandLineRunner {
         log.info("开始数据导入");
         String fileName = "住院数据_ES.xlsx";
         String sheetName = "住院数据";
-        importData(fileName, sheetName);
+//        importData(fileName, sheetName);
         log.info("数据导入完成");
     }
 }

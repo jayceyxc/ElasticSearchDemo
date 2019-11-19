@@ -240,6 +240,8 @@ public class BaseElasticDao {
             AcknowledgedResponse response = restHighLevelClient.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
             if (!response.isAcknowledged()) {
                 throw new RuntimeException("删除索引失败");
+            } else {
+                log.info("删除索引成功：" + idxName);
             }
             return true;
         } catch (ElasticsearchException exception) {
@@ -325,7 +327,7 @@ public class BaseElasticDao {
      * @param <T> 类型
      * @return
      */
-    public <T> List<T> search(String idxName, SearchSourceBuilder builder, Class<T> c) {
+    public <T> List<T> searchReturnHits(String idxName, SearchSourceBuilder builder, Class<T> c) {
 
         SearchRequest request = new SearchRequest(idxName);
         request.source(builder);
@@ -351,7 +353,7 @@ public class BaseElasticDao {
      * @param builder 查询参数
      * @return
      */
-    public String search(String idxName, SearchSourceBuilder builder) {
+    public String searchReturnHits(String idxName, SearchSourceBuilder builder) {
         SearchRequest request = new SearchRequest(idxName);
         request.source(builder);
         try {
@@ -375,12 +377,32 @@ public class BaseElasticDao {
     }
 
     /**
+     * 查询
+     * @param idxName 索引名称
+     * @param builder 查询参数
+     * @return
+     */
+    public SearchResponse searchReturnRaw(String idxName, SearchSourceBuilder builder) {
+        SearchRequest request = new SearchRequest(idxName);
+        request.source(builder);
+        try {
+            return restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        } catch (ElasticsearchException ee) {
+            log.error("数据搜索失败", ee);
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
+        }
+
+        return null;
+    }
+
+    /**
      * 多条件查询
      * @param idxName 索引名称
      * @param sourceBuilderList 查询参数列表
      * @return
      */
-    public String search(String idxName, List<SearchSourceBuilder> sourceBuilderList) {
+    public String searchReturnHits(String idxName, List<SearchSourceBuilder> sourceBuilderList) {
         MultiSearchRequest multiSearchRequest = new MultiSearchRequest();
         for (SearchSourceBuilder sourceBuilder : sourceBuilderList) {
             SearchRequest request = new SearchRequest(idxName);
