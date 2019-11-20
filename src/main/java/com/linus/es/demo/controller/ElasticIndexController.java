@@ -112,4 +112,24 @@ public class ElasticIndexController {
         }
         return response;
     }
+
+    @RequestMapping(value = "/alias/{oldIndex}/{aliasIndex}")
+    public ResponseResult aliasIndex(@PathVariable(value = "oldIndex") String oldIndex, @PathVariable(value = "aliasIndex") String aliasIndex){
+        ResponseResult response = new ResponseResult();
+        try {
+            boolean result = baseElasticDao.aliasIndex(oldIndex, aliasIndex);
+            if (result) {
+                response.setMsg("创建索引别名成功：索引名称：" + oldIndex + ", 索引别名：" + aliasIndex);
+            } else {
+                response.setCode(ResponseCode.FAILED.getCode());
+                response.setMsg("创建索引别名失败：索引名称：" + oldIndex + ", 索引别名：" + aliasIndex);
+                response.setStatus(false);
+            }
+        } catch (Exception e) {
+            response.setCode(ResponseCode.NETWORK_ERROR.getCode());
+            response.setMsg(" 调用ElasticSearch 失败！");
+            response.setStatus(false);
+        }
+        return response;
+    }
 }

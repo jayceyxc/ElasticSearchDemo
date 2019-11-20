@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.linus.es.demo.entity.ElasticEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -52,6 +53,16 @@ public class BaseElasticDao {
 
     @Autowired
     RestHighLevelClient restHighLevelClient;
+
+    /**
+     * 设置分片
+     * @param request
+     */
+    private void buildSetting(CreateIndexRequest request){
+
+        request.settings(Settings.builder().put("index.number_of_shards",3)
+                .put("index.number_of_replicas",2));
+    }
 
     /**
      * 创建ES索引
@@ -152,13 +163,63 @@ public class BaseElasticDao {
     }
 
     /**
-     * 设置分片
-     * @param request
+     * 删除索引
+     * @param idxName 索引名称
      */
-    public void buildSetting(CreateIndexRequest request){
+    public boolean deleteIndex(String idxName) {
+        try {
+            DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(idxName);
+            // 设置超时，等待所有节点确认索引删除（使用TimeValue形式）
+            deleteIndexRequest.timeout(TimeValue.timeValueMinutes(1));
+            // 连接master节点的超时时间(使用TimeValue方式)
+            deleteIndexRequest.masterNodeTimeout(TimeValue.timeValueMinutes(2));
+            // 设置IndicesOptions控制如何解决不可用的索引以及如何扩展通配符表达式
+//            deleteIndexRequest.indicesOptions(IndicesOptions.lenientExpandOpen());
 
-        request.settings(Settings.builder().put("index.number_of_shards",3)
-                .put("index.number_of_replicas",2));
+            AcknowledgedResponse response = restHighLevelClient.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
+            if (!response.isAcknowledged()) {
+                throw new RuntimeException("删除索引失败");
+            } else {
+                log.info("删除索引成功：" + idxName);
+            }
+            return true;
+        } catch (ElasticsearchException exception) {
+            if (exception.status() == RestStatus.NOT_FOUND) {
+                log.warn("要删除的索引不存在: " + idxName);
+            }
+            return false;
+        } catch (IOException ioe) {
+            log.error(ioe.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 索引别名
+     * @param oldIndexName 原索引名字
+     * @param aliasIndexName 索引别名
+     * @return
+     */
+    public boolean aliasIndex(String oldIndexName, String aliasIndexName) {
+        IndicesAliasesRequest request = new IndicesAliasesRequest();
+        IndicesAliasesRequest.AliasActions aliasActions = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.ADD).index(oldIndexName).alias(aliasIndexName);
+        request.addAliasAction(aliasActions);
+        try {
+            AcknowledgedResponse response = restHighLevelClient.indices().updateAliases(request, RequestOptions.DEFAULT);
+            if (!response.isAcknowledged()) {
+                log.error("创建索引别名失败。索引名称：" + oldIndexName + ", 索引别名：" + aliasIndexName);
+                return false;
+            } else {
+                log.info("创建索引别名成功。索引名称：" + oldIndexName + ", 索引别名：" + aliasIndexName);
+            }
+            return true;
+        } catch (ElasticsearchException ee) {
+            log.error("创建索引别名失败", ee);
+            return false;
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
+            return false;
+        }
     }
 
     /**
@@ -220,38 +281,6 @@ public class BaseElasticDao {
             log.error("数据插入失败", ee);
         } catch (IOException ioe) {
             log.error("IO异常", ioe);
-        }
-    }
-
-    /**
-     * 删除索引
-     * @param idxName 索引名称
-     */
-    public boolean deleteIndex(String idxName) {
-        try {
-            DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(idxName);
-            // 设置超时，等待所有节点确认索引删除（使用TimeValue形式）
-            deleteIndexRequest.timeout(TimeValue.timeValueMinutes(1));
-            // 连接master节点的超时时间(使用TimeValue方式)
-            deleteIndexRequest.masterNodeTimeout(TimeValue.timeValueMinutes(2));
-            // 设置IndicesOptions控制如何解决不可用的索引以及如何扩展通配符表达式
-//            deleteIndexRequest.indicesOptions(IndicesOptions.lenientExpandOpen());
-
-            AcknowledgedResponse response = restHighLevelClient.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
-            if (!response.isAcknowledged()) {
-                throw new RuntimeException("删除索引失败");
-            } else {
-                log.info("删除索引成功：" + idxName);
-            }
-            return true;
-        } catch (ElasticsearchException exception) {
-            if (exception.status() == RestStatus.NOT_FOUND) {
-                log.warn("要删除的索引不存在: " + idxName);
-            }
-            return false;
-        } catch (IOException ioe) {
-            log.error(ioe.getMessage());
-            return false;
         }
     }
 
