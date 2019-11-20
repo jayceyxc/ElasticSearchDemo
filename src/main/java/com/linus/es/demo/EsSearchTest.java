@@ -49,14 +49,14 @@ public class EsSearchTest implements CommandLineRunner {
      */
     private String testDiagnosisDataSearch() {
         ElasticQueryBuilderUtil queryBuilderTools = new ElasticQueryBuilderUtil(searchAnalyzer);
-        NestedQueryBuilder diagNestedQueryBuilder = queryBuilderTools.buildDiagnosisQueryBuilder("冠状动脉粥样硬化性心脏病");
-        MatchQueryBuilder chiefComplaintMatchQuery = QueryBuilders.matchQuery("chief_complaint", "胸闷");
+        NestedQueryBuilder diagNestedQueryBuilder = queryBuilderTools.buildDiagnosisQueryBuilder("阵发性房颤");
+//        MatchQueryBuilder chiefComplaintMatchQuery = QueryBuilders.matchQuery("chief_complaint", "胸闷");
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(diagNestedQueryBuilder);
-        boolQueryBuilder.must(chiefComplaintMatchQuery);
+//        boolQueryBuilder.must(chiefComplaintMatchQuery);
         SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(boolQueryBuilder, 0, 100, 2000, 0.5f);
-        String searchResult = elasticDao.searchReturnHits("original", searchSourceBuilder);
+        String searchResult = elasticDao.searchReturnHits("original_alias", searchSourceBuilder);
         log.info(searchResult);
         return searchResult;
     }
@@ -166,7 +166,9 @@ public class EsSearchTest implements CommandLineRunner {
 //        log.info(result);
 //        String result = testOperationDataSearch();
 //        log.info("手术查询结果：" + result);
-        String result = testOfficeStat();
-        log.info("科室查询结果：" + result);
+//        String result = testOfficeStat();
+//        log.info("科室查询结果：" + result);
+        String result = testDiagnosisDataSearch();
+        log.info("手术查询结果：" + result);
     }
 }

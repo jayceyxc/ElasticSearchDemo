@@ -132,4 +132,44 @@ public class ElasticIndexController {
         }
         return response;
     }
+
+    @RequestMapping(value = "/delalias/{oldIndex}/{aliasIndex}")
+    public ResponseResult delAliasIndex(@PathVariable(value = "oldIndex") String oldIndex, @PathVariable(value = "aliasIndex") String aliasIndex){
+        ResponseResult response = new ResponseResult();
+        try {
+            boolean result = baseElasticDao.deleteAliasIndex(oldIndex, aliasIndex);
+            if (result) {
+                response.setMsg("删除索引别名成功：索引名称：" + oldIndex + ", 索引别名：" + aliasIndex);
+            } else {
+                response.setCode(ResponseCode.FAILED.getCode());
+                response.setMsg("删除索引别名失败：索引名称：" + oldIndex + ", 索引别名：" + aliasIndex);
+                response.setStatus(false);
+            }
+        } catch (Exception e) {
+            response.setCode(ResponseCode.NETWORK_ERROR.getCode());
+            response.setMsg(" 调用ElasticSearch 失败！");
+            response.setStatus(false);
+        }
+        return response;
+    }
+
+    @RequestMapping(value = "/reindex/{sourceIndex}/{destIndex}")
+    public ResponseResult reindex(@PathVariable(value = "sourceIndex") String sourceIndex, @PathVariable(value = "destIndex") String destIndex){
+        ResponseResult response = new ResponseResult();
+        try {
+            boolean result = baseElasticDao.reindex(sourceIndex, destIndex);
+            if (result) {
+                response.setMsg("重建索引成功：原索引名称：" + sourceIndex + ", 目标索引名称：" + destIndex);
+            } else {
+                response.setCode(ResponseCode.FAILED.getCode());
+                response.setMsg("重建索引失败：原索引名称：" + sourceIndex + ", 目标索引名称：" + destIndex);
+                response.setStatus(false);
+            }
+        } catch (Exception e) {
+            response.setCode(ResponseCode.NETWORK_ERROR.getCode());
+            response.setMsg(" 调用ElasticSearch 失败！");
+            response.setStatus(false);
+        }
+        return response;
+    }
 }

@@ -20,7 +20,7 @@ public class ElasticQueryBuilderUtil {
     private String searchAnalyzer;
 
     public ElasticQueryBuilderUtil() {
-        this.searchAnalyzer = "ik_smark";
+        this.searchAnalyzer = "ik_smart";
     }
 
     public ElasticQueryBuilderUtil(String searchAnalyzer) {
@@ -37,7 +37,8 @@ public class ElasticQueryBuilderUtil {
     private NestedQueryBuilder buildNestedQueryBuilder(String path, String field, String searchText) {
         BoolQueryBuilder nestedBoolQueryBuilder = QueryBuilders.boolQuery();
         MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(field, searchText);
-        nestedBoolQueryBuilder.should(matchQueryBuilder);
+        matchQueryBuilder.analyzer(searchAnalyzer);
+        nestedBoolQueryBuilder.must(matchQueryBuilder);
         NestedQueryBuilder nestedQueryBuilder = QueryBuilders.nestedQuery(path, nestedBoolQueryBuilder, ScoreMode.Max);
         log.info("returned query: " + nestedBoolQueryBuilder);
 

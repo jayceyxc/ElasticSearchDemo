@@ -26,8 +26,11 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.VersionType;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
+import org.elasticsearch.index.reindex.ReindexRequest;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -215,6 +218,66 @@ public class BaseElasticDao {
             return true;
         } catch (ElasticsearchException ee) {
             log.error("创建索引别名失败", ee);
+            return false;
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
+            return false;
+        }
+    }
+
+    /**
+     * 删除索引别名
+     * @param oldIndexName 原索引名字
+     * @param aliasIndexName 索引别名
+     * @return
+     */
+    public boolean deleteAliasIndex(String oldIndexName, String aliasIndexName) {
+        IndicesAliasesRequest request = new IndicesAliasesRequest();
+        IndicesAliasesRequest.AliasActions aliasActions = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.REMOVE).index(oldIndexName).alias(aliasIndexName);
+        request.addAliasAction(aliasActions);
+        try {
+            AcknowledgedResponse response = restHighLevelClient.indices().updateAliases(request, RequestOptions.DEFAULT);
+            if (!response.isAcknowledged()) {
+                log.error("删除索引别名失败。索引名称：" + oldIndexName + ", 索引别名：" + aliasIndexName);
+                return false;
+            } else {
+                log.info("删除索引别名成功。索引名称：" + oldIndexName + ", 索引别名：" + aliasIndexName);
+            }
+            return true;
+        } catch (ElasticsearchException ee) {
+            log.error("创建索引别名失败", ee);
+            return false;
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
+            return false;
+        }
+    }
+
+    /**
+     * 重建索引
+     * @param sourceIndex 原索引名称
+     * @param destIndex 目标索引名称
+     * @return
+     */
+    public boolean reindex(String sourceIndex, String destIndex) {
+        ReindexRequest request = new ReindexRequest().setSourceIndices(sourceIndex).setDestIndex(destIndex);
+        // versionType默认是INTERNAL，ElasticSearch会盲目的将文档拷贝到目标index
+        // 设置为EXTERNAL，则ElasticSearch会维持原索引中的版本，目标索引中没有的文档会新建，目标索引中的文档版本比原索引中
+        // 版本号老的会更新
+        request.setDestVersionType(VersionType.INTERNAL);
+        // 可以设置proceed或abort
+        request.setConflicts("proceed");
+        request.setRefresh(true);
+        try {
+            BulkByScrollResponse bulkResponse = restHighLevelClient.reindex(request, RequestOptions.DEFAULT);
+            log.info(bulkResponse.getTook().toString());
+            log.info("总文档数：" + bulkResponse.getTotal());
+            log.info("更新文档数：" + bulkResponse.getUpdated());
+            log.info("新建文档数：" + bulkResponse.getCreated());
+            log.info("删除文档数：" + bulkResponse.getDeleted());
+            return true;
+        } catch (ElasticsearchException ee) {
+            log.error("重建索引失败", ee);
             return false;
         } catch (IOException ioe) {
             log.error("IO异常", ioe);
