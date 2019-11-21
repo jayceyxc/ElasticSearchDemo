@@ -4,6 +4,7 @@ import com.linus.es.demo.dao.BaseElasticDao;
 import com.linus.es.demo.entity.ElasticEntity;
 import com.linus.es.demo.response.ResponseCode;
 import com.linus.es.demo.response.ResponseResult;
+import com.linus.es.demo.utils.ElasticQueryBuilderUtil;
 import com.linus.es.demo.utils.ElasticUtil;
 import com.linus.es.demo.vo.ElasticDataVO;
 import com.linus.es.demo.vo.QueryVO;
@@ -42,6 +43,12 @@ public class ElasticDataController {
      */
     @Value("${es.search_timeout}")
     public int searchTimeout;
+
+    /**
+     * ElasticSearch搜索时使用的分词器
+     */
+    @Value("${es.search_analyzer}")
+    public String searchAnalyzer;
 
     @Autowired
     private BaseElasticDao baseElasticDao;
@@ -142,7 +149,7 @@ public class ElasticDataController {
 
     @RequestMapping(value = "/simple_search",method = RequestMethod.GET)
     public ResponseResult simpleSearch(@RequestBody SimpleStringSearchVO simpleStringSearchVO){
-        log.info("enter search");
+        log.info("enter simpleSearch");
         ResponseResult<String> response = new ResponseResult<>();
         try {
             QueryBuilder queryBuilder = QueryBuilders.simpleQueryStringQuery(simpleStringSearchVO.getQuery());
@@ -155,6 +162,23 @@ public class ElasticDataController {
             response.setStatus(false);
             log.error("查询数据异常，metadataVo={},异常信息={}", simpleStringSearchVO.toString(),e.getMessage());
         }
+        return response;
+    }
+
+    @RequestMapping(value = "/search_all/{index}/{text}", method = RequestMethod.GET)
+    public ResponseResult searchAll(@PathVariable("index") String index, @PathVariable("text") String text){
+        log.info("enter searchAll");
+        ResponseResult<String> response = new ResponseResult<>();
+        ElasticQueryBuilderUtil queryBuilderTools = new ElasticQueryBuilderUtil(searchAnalyzer);
+        NestedQueryBuilder diagNestedQueryBuilder = queryBuilderTools.buildDiagnosisQueryBuilder(text);
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(diagNestedQueryBuilder);
+        SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(boolQueryBuilder, 0, 100, 2000, 0.5f);
+        String searchResult = baseElasticDao.searchReturnHits(index, searchSourceBuilder);
+        log.info(searchResult);
+        response.setMsg(searchResult);
+
         return response;
     }
 

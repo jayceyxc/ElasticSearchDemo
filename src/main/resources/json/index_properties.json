@@ -1,0 +1,707 @@
+{
+  "dynamic": false,
+  "properties":
+  {
+    "id":
+    {
+      "type": "text",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "hospital_name":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "pay_type":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "admission_num":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "inpatient_id":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "inpatient_serial_num":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "name":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "sex":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "birth_date":
+    {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "age":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "marital_status":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "profession":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "birthplace":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "nationality":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "country":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "identity_card_num":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "present_addr":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "home_telephone":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "mobile":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "work_unit_addr":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "registered_addr":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "contact_name":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "relationship":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "contact_addr":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "contact_mobile":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "admission_type":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "admission_date":
+    {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "admission_dep":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "admission_ward":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "transfer_dep":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "discharge_date":
+    {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "discharge_dep":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "discharge_ward":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "hospital_stay":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "admission_status":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "section_director":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "chief_physician":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "attending_physician":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "resident":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "primary_nurse":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "medical_record_quality":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields":
+      {
+        "raw":
+        {
+          "type": "keyword"
+        }
+      }
+    },
+    "chief_complaint":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "present_illness_history":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "past_medical_history":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "personal_history":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "marriage_history":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "menstrual_history":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "family_history":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "physical_examination":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "auxiliary_examination":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "medical_history_summary":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "primary_diagnosis":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "first_disease_course":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "daily_disease_course":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "operation_record":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "salvage_record":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "discharge_record":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "discharge_abstract":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "death_record":
+    {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "treatment_data":
+    {
+      "type": "nested",
+      "properties":
+      {
+        "name":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "fields":
+          {
+            "raw":
+            {
+              "type": "keyword"
+            }
+          }
+        },
+        "date":
+        {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+        },
+        "per_dose":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word"
+        },
+        "category":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "fields":
+          {
+            "raw":
+            {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "check_data":
+    {
+      "type": "nested",
+      "properties":
+      {
+        "name":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "fields":
+          {
+            "raw":
+            {
+              "type": "keyword"
+            }
+          }
+        },
+        "date":
+        {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+        },
+        "detailItemList":
+        {
+          "type": "nested",
+          "properties":
+          {
+            "result":
+            {
+              "type": "text",
+              "analyzer": "ik_max_word"
+            },
+            "detailName":
+            {
+              "type": "text",
+              "analyzer": "ik_max_word",
+              "fields":
+              {
+                "raw":
+                {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "examination_data":
+    {
+      "type": "nested",
+      "properties":
+      {
+        "examination_category_code":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "fields":
+          {
+            "raw":
+            {
+              "type": "keyword"
+            }
+          }
+        },
+        "examination_result":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word"
+        },
+        "image_direction":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word"
+        }
+      }
+    },
+    "diagnosis_data":
+    {
+      "type": "nested",
+      "properties":
+      {
+        "diagnosis_code":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "fields":
+          {
+            "raw":
+            {
+              "type": "keyword"
+            }
+          }
+        },
+        "diagnosis_name":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "fields":
+          {
+            "raw":
+            {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "operation_data":
+    {
+      "type": "nested",
+      "properties":
+      {
+        "operation_name":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "fields":
+          {
+            "raw":
+            {
+              "type": "keyword"
+            }
+          }
+        },
+        "operation_date":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word"
+        },
+        "operation_code":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "fields":
+          {
+            "raw":
+            {
+              "type": "keyword"
+            }
+          }
+        },
+        "operator":
+        {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "fields":
+          {
+            "raw":
+            {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}

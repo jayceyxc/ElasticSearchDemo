@@ -1,10 +1,13 @@
 package com.linus.es.demo.dao;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.linus.es.demo.entity.ElasticEntity;
+import com.linus.es.demo.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
+import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -19,9 +22,11 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.*;
+import org.elasticsearch.cluster.metadata.AliasMetaData;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
@@ -36,6 +41,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +59,12 @@ import java.util.*;
 @Component
 @Order(value = 1)
 public class BaseElasticDao {
+
+    /**
+     * ElasticSearch创建索引时默认使用的属性配置文件
+     */
+    @Value("${es.properties_json}")
+    public String propertiesJson;
 
     @Autowired
     RestHighLevelClient restHighLevelClient;
@@ -129,6 +141,28 @@ public class BaseElasticDao {
             e.printStackTrace();
             return false;
         }
+    }
+
+
+    /**
+     * 根据配置文件index_properties.json配置的属性创建索引
+     * @param indexName 索引名称
+     * @return
+     */
+    public boolean createDefaultIndex(String indexName) {
+        return createDefaultIndex(indexName, propertiesJson);
+    }
+
+    /**
+     * 根据配置文件index_properties.json配置的属性创建索引
+     * @param indexName 索引名称
+     * @return
+     */
+    public boolean createDefaultIndex(String indexName, String jsonPropertiesFile) {
+        JSONObject jsonObject = JsonUtil.getJsonObjFromResource(jsonPropertiesFile);
+        String jsonProperties = jsonObject.toJSONString();
+        log.warn("indexName={}, indexSql={}", indexName, jsonProperties);
+        return createIndex(indexName, jsonProperties);
     }
 
     /**
@@ -245,12 +279,57 @@ public class BaseElasticDao {
             }
             return true;
         } catch (ElasticsearchException ee) {
-            log.error("创建索引别名失败", ee);
+            log.error("删除索引别名失败", ee);
             return false;
         } catch (IOException ioe) {
             log.error("IO异常", ioe);
             return false;
         }
+    }
+
+    /**
+     * 获取索引别名相关信息
+     * @param aliasIndexName 索引别名
+     * @return
+     */
+    public String getAliasIndex(String aliasIndexName) {
+        String result = null;
+        GetAliasesRequest request = new GetAliasesRequest();
+        request.aliases(aliasIndexName);
+        try {
+            GetAliasesResponse response = restHighLevelClient.indices().getAlias(request, RequestOptions.DEFAULT);
+            if (response.status() == RestStatus.OK) {
+                log.error("查询索引别名成功。索引别名：" + aliasIndexName);
+                Map<String, Set<AliasMetaData>> aliases = response.getAliases();
+                if (aliases == null || aliases.size() == 0) {
+                    log.info("索引别名不存在。索引别名：" + aliasIndexName);
+                    return result;
+                }
+                if (aliases.size() > 1) {
+                    log.info("索引别名对应的索引有多个，请手动确认。索引别名：" + aliasIndexName);
+                    return result;
+                }
+
+                for (Map.Entry<String, Set<AliasMetaData>> entry : aliases.entrySet()) {
+                    Set<AliasMetaData> aliasMetaDataSet = entry.getValue();
+                    for (AliasMetaData metaData : aliasMetaDataSet) {
+                        if (metaData.getAlias().equalsIgnoreCase(aliasIndexName)) {
+                            result = entry.getKey();
+                        }
+                    }
+                }
+            } else {
+                log.info("查询索引别名失败。索引别名：" + aliasIndexName);
+            }
+        } catch (ElasticsearchException ee) {
+            log.error("查询索引别名失败", ee);
+            return result;
+        } catch (IOException ioe) {
+            log.error("IO异常", ioe);
+            return result;
+        }
+
+        return result;
     }
 
     /**
@@ -269,7 +348,11 @@ public class BaseElasticDao {
         request.setConflicts("proceed");
         request.setRefresh(true);
         try {
+            log.info("开始索引重建：原索引：" + sourceIndex + "，目标索引：" + destIndex);
+            long startTime = System.currentTimeMillis();
             BulkByScrollResponse bulkResponse = restHighLevelClient.reindex(request, RequestOptions.DEFAULT);
+            long finishedTime = System.currentTimeMillis();
+            log.info("完成索引重建：原索引：" + sourceIndex + "，目标索引：" + destIndex + "，共耗时：" + (finishedTime - startTime) + "ms");
             log.info(bulkResponse.getTook().toString());
             log.info("总文档数：" + bulkResponse.getTotal());
             log.info("更新文档数：" + bulkResponse.getUpdated());
@@ -460,7 +543,7 @@ public class BaseElasticDao {
             }
             return JSON.toJSONString(returnResult);
         } catch (ElasticsearchException ee) {
-            log.error("数据搜索失败", ee);
+            log.error("数据搜索失败，原因：" + ee.getDetailedMessage(), ee);
         } catch (IOException ioe) {
             log.error("IO异常", ioe);
         }

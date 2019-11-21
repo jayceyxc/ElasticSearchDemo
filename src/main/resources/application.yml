@@ -10,9 +10,19 @@ es:
   search_timeout: 2000
   # 返回文档的最低评分
   min_score: 0.5
+  # ElasticSearch的用户名密码
   username: elastic
   password: elastic
+  # 搜索时使用的分词算法
   search_analyzer: ik_smart
+  # 原索引名称
+  index_name: original
+  # 索引别名，用于实际搜索时使用
+  alias_name: original_alias
+  # 重建索引时使用的索引名称
+  temp_index_name: original_dest
+  # 默认的索引属性配置文件
+  properties_json: /json/index_properties.json
 
 logging:
   file:

@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @Order(value = 2)
 public class ImportDataToEsFromExcel implements CommandLineRunner {
+
+    /**
+     * ElasticSearch搜索时使用的分词器
+     */
+    @Value("${es.index_name}")
+    public String indexName;
 
     @Autowired
     private BaseElasticDao elasticDao;
@@ -182,10 +189,10 @@ public class ImportDataToEsFromExcel implements CommandLineRunner {
                 ElasticEntity elasticEntity = new ElasticEntity();
                 elasticEntity.setId(id);
                 elasticEntity.setData(data);
-                elasticDao.insertOrUpdateOne("original", elasticEntity);
+                elasticDao.insertOrUpdateOne(indexName, elasticEntity);
                 elasticEntityList.add(elasticEntity);
 //                if (elasticEntityList.size() >= 10) {
-//                    elasticDao.insertBatch("original", elasticEntityList);
+//                    elasticDao.insertBatch(indexName, elasticEntityList);
 //                    elasticEntityList.clear();
 //                }
             }

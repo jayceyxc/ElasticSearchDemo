@@ -40,6 +40,12 @@ public class EsSearchTest implements CommandLineRunner {
     @Value("${es.search_analyzer}")
     public String searchAnalyzer;
 
+    /**
+     * ElasticSearch搜索时使用的索引名称
+     */
+    @Value("${es.index_name}")
+    public String indexName;
+
     @Autowired
     BaseElasticDao elasticDao;
 
@@ -56,7 +62,7 @@ public class EsSearchTest implements CommandLineRunner {
         boolQueryBuilder.must(diagNestedQueryBuilder);
 //        boolQueryBuilder.must(chiefComplaintMatchQuery);
         SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(boolQueryBuilder, 0, 100, 2000, 0.5f);
-        String searchResult = elasticDao.searchReturnHits("original_alias", searchSourceBuilder);
+        String searchResult = elasticDao.searchReturnHits(indexName, searchSourceBuilder);
         log.info(searchResult);
         return searchResult;
     }
@@ -72,7 +78,7 @@ public class EsSearchTest implements CommandLineRunner {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(operationNestedQueryBuilder);
         SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(boolQueryBuilder, 0, 100, 2000, 0.5f);
-        String searchResult = elasticDao.searchReturnHits("original", searchSourceBuilder);
+        String searchResult = elasticDao.searchReturnHits(indexName, searchSourceBuilder);
         log.info(searchResult);
         return searchResult;
     }
@@ -94,7 +100,7 @@ public class EsSearchTest implements CommandLineRunner {
         boolQueryBuilder.must(examQueryBuilder);
         boolQueryBuilder.mustNot(chiefComplaintNotMatchQuery);
         SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(boolQueryBuilder, 0, 100, 2000, 0.5f);
-        String searchResult = elasticDao.searchReturnHits("original", searchSourceBuilder);
+        String searchResult = elasticDao.searchReturnHits(indexName, searchSourceBuilder);
         log.info(searchResult);
         return searchResult;
     }
@@ -108,7 +114,7 @@ public class EsSearchTest implements CommandLineRunner {
         MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(searchText, searchFileds.toArray(new String[0]));
 
         SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(multiMatchQueryBuilder, 0, 100, 2000, 0.5f);
-        String searchResult = elasticDao.searchReturnHits("original", searchSourceBuilder);
+        String searchResult = elasticDao.searchReturnHits(indexName, searchSourceBuilder);
         log.info(searchResult);
         return searchResult;
     }
@@ -122,7 +128,7 @@ public class EsSearchTest implements CommandLineRunner {
         CardinalityAggregationBuilder dischargeDepAggr = AggregationBuilders.cardinality("discharge_dep_total");
         dischargeDepAggr.field("discharge_dep.raw");
         SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilder, dischargeDepAggr, 0, 100, 2000, 0.5f);
-        SearchResponse response = elasticDao.searchReturnRaw("original", searchSourceBuilder);
+        SearchResponse response = elasticDao.searchReturnRaw(indexName, searchSourceBuilder);
         Aggregations aggregations = response.getAggregations();
         Map<String, Aggregation> aggregationMap = aggregations.getAsMap();
         for (Map.Entry<String, Aggregation> entry : aggregationMap.entrySet()) {
@@ -145,7 +151,7 @@ public class EsSearchTest implements CommandLineRunner {
         aggregationBuilder.field("discharge_dep.raw");
         aggregationBuilder.size(20);
         SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(queryBuilder, aggregationBuilder, 0, 100, 2000, 0.5f);
-        SearchResponse response = elasticDao.searchReturnRaw("original", searchSourceBuilder);
+        SearchResponse response = elasticDao.searchReturnRaw(indexName, searchSourceBuilder);
         Aggregations aggregations = response.getAggregations();
         Map<String, Aggregation> aggregationMap = aggregations.getAsMap();
         for (Map.Entry<String, Aggregation> entry : aggregationMap.entrySet()) {
