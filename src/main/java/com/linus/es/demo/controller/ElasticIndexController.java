@@ -235,7 +235,7 @@ public class ElasticIndexController {
                 log.info("查询索引别名失败：索引别名：" + aliasName);
                 index = indexName;
             } else {
-                log.info("查询索引别名失败：索引别名：" + aliasName + "，索引名称：" + index);
+                log.info("查询索引别名成功：索引别名：" + aliasName + "，索引名称：" + index);
             }
 
             if (index.equalsIgnoreCase(tempIndexName)) {
@@ -243,15 +243,7 @@ public class ElasticIndexController {
                 tempIndex = indexName;
             }
 
-            boolean result = baseElasticDao.aliasIndex(index, aliasName);
-            if (result) {
-                log.info("创建索引别名成功：索引名称：" + index + ", 索引别名：" + aliasName);
-            } else {
-                response.setCode(ResponseCode.FAILED.getCode());
-                response.setMsg("创建索引别名失败：索引名称：" + index + ", 索引别名：" + aliasName);
-                response.setStatus(false);
-                return response;
-            }
+            boolean result;
             if (!baseElasticDao.indexExist(tempIndex)) {
                 log.warn("临时索引不存在，使用默认配置创建临时索引：" + tempIndex);
                 result = baseElasticDao.createDefaultIndex(tempIndex);

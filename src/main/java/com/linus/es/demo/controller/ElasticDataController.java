@@ -50,6 +50,12 @@ public class ElasticDataController {
     @Value("${es.search_analyzer}")
     public String searchAnalyzer;
 
+    /**
+     * ElasticSearch全字段搜索时使用的字段名列表
+     */
+    @Value("${es.all_fields}")
+    public String allFields;
+
     @Autowired
     private BaseElasticDao baseElasticDao;
 
@@ -168,6 +174,32 @@ public class ElasticDataController {
     @RequestMapping(value = "/search_all/{index}/{text}", method = RequestMethod.GET)
     public ResponseResult searchAll(@PathVariable("index") String index, @PathVariable("text") String text){
         log.info("enter searchAll");
+        ResponseResult<String> response = new ResponseResult<>();
+        ElasticQueryBuilderUtil queryBuilderTools = new ElasticQueryBuilderUtil(searchAnalyzer);
+        BoolQueryBuilder allQueryBuilder = queryBuilderTools.buildAllQueryBuilder(text, allFields);
+
+        SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(allQueryBuilder, 0, 100, 2000, 0.5f);
+        String searchResult = baseElasticDao.searchReturnHits(index, searchSourceBuilder);
+        log.info(searchResult);
+        response.setMsg(searchResult);
+
+        return response;
+    }
+
+    /**
+     * bool查询入口。
+     * 支持AND、OR和NOT，可以是大写或小写单词，单词两边要有空格和中文分开
+     * 运算符优先级，从高到低依次为NOT、AND、OR，可以使用括号来改变运算词序
+     * 例如：
+     * 华法林 AND 肌钙蛋白
+     * 达比加群 NOT 华法林
+     * @param index 搜索的索引名
+     * @param text 布尔搜索文本
+     * @return 搜索结果
+     */
+    @RequestMapping(value = "/bool_search/{index}/{text}", method = RequestMethod.GET)
+    public ResponseResult boolSearch(@PathVariable("index") String index, @PathVariable("text") String text){
+        log.info("enter boolSearch");
         ResponseResult<String> response = new ResponseResult<>();
         ElasticQueryBuilderUtil queryBuilderTools = new ElasticQueryBuilderUtil(searchAnalyzer);
         NestedQueryBuilder diagNestedQueryBuilder = queryBuilderTools.buildDiagnosisQueryBuilder(text);

@@ -23,6 +23,8 @@ es:
   temp_index_name: original_dest
   # 默认的索引属性配置文件
   properties_json: /json/index_properties.json
+  # 全字段检索的字段列表
+  all_fields: admission_dep,admission_ward,attending_physician,auxiliary_examination,birthplace,chief_complaint,chief_physician,daily_disease_course,examination_data,family_history,first_disease_course,marriage_history,past_medical_history,operation_record,personal_history,physical_examination,present_illness_history
 
 logging:
   file:

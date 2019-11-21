@@ -36,9 +36,9 @@ public class ElasticQueryBuilderUtil {
      */
     private NestedQueryBuilder buildNestedQueryBuilder(String path, String field, String searchText) {
         BoolQueryBuilder nestedBoolQueryBuilder = QueryBuilders.boolQuery();
-        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(field, searchText);
-        matchQueryBuilder.analyzer(searchAnalyzer);
-        nestedBoolQueryBuilder.must(matchQueryBuilder);
+        MatchPhrasePrefixQueryBuilder phrasePrefixQueryBuilder = QueryBuilders.matchPhrasePrefixQuery(field, searchText);
+        phrasePrefixQueryBuilder.analyzer(searchAnalyzer);
+        nestedBoolQueryBuilder.should(phrasePrefixQueryBuilder);
         NestedQueryBuilder nestedQueryBuilder = QueryBuilders.nestedQuery(path, nestedBoolQueryBuilder, ScoreMode.Max);
         log.info("returned query: " + nestedBoolQueryBuilder);
 
@@ -116,5 +116,48 @@ public class ElasticQueryBuilderUtil {
     public NestedQueryBuilder buildTreatmentQueryBuilder(String searchText) {
         return buildNestedQueryBuilder("treatment_data", Arrays.asList("examination_data.image_direction",
                 "examination_data.examination_category_code", "examination_data.examination_result"), searchText);
+    }
+
+    /**
+     * 构建其他文本的查询对象
+     * @param searchText 搜索文本
+     * @return 其他文本布尔查询
+     */
+    public MultiMatchQueryBuilder buildOtherTextQueryBuilder(String searchText, String fields) {
+        List<String> searchFileds = Arrays.asList(fields.split(","));
+        MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(searchText, searchFileds.toArray(new String[0]));
+        multiMatchQueryBuilder.type(MultiMatchQueryBuilder.Type.PHRASE_PREFIX);
+
+        return multiMatchQueryBuilder;
+    }
+
+    /**
+     * 搜索手游文本的查询对象
+     * @param searchText 搜索文本
+     * @return bool查询对象
+     */
+    public BoolQueryBuilder buildAllQueryBuilder(String searchText, String fields) {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        // 搜索检验
+        BoolQueryBuilder checkBoolQueryBuilder = buildCheckQueryBuilder(searchText);
+        // 搜索检查
+        NestedQueryBuilder examQueryBuilder = buildExamQueryBuilder(searchText);
+        // 搜索医嘱
+        NestedQueryBuilder treatmentQueryBuilder = buildTreatmentQueryBuilder(searchText);
+        // 搜索诊断
+        NestedQueryBuilder diagnosisQueryBuilder = buildDiagnosisQueryBuilder(searchText);
+        // 搜索手术
+        NestedQueryBuilder operationQueryBuilder = buildOperationQueryBuilder(searchText);
+        // 搜索全文
+        MultiMatchQueryBuilder multiMatchQueryBuilder = buildOtherTextQueryBuilder(searchText, fields);
+
+        boolQueryBuilder.should(checkBoolQueryBuilder);
+        boolQueryBuilder.should(examQueryBuilder);
+        boolQueryBuilder.should(treatmentQueryBuilder);
+        boolQueryBuilder.should(diagnosisQueryBuilder);
+        boolQueryBuilder.should(operationQueryBuilder);
+        boolQueryBuilder.should(multiMatchQueryBuilder);
+
+        return boolQueryBuilder;
     }
 }
