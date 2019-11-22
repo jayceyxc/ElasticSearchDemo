@@ -4,6 +4,7 @@ import com.linus.es.demo.dao.BaseElasticDao;
 import com.linus.es.demo.entity.ElasticEntity;
 import com.linus.es.demo.response.ResponseCode;
 import com.linus.es.demo.response.ResponseResult;
+import com.linus.es.demo.utils.BoolExpressionParser;
 import com.linus.es.demo.utils.ElasticQueryBuilderUtil;
 import com.linus.es.demo.utils.ElasticUtil;
 import com.linus.es.demo.vo.ElasticDataVO;
@@ -12,13 +13,19 @@ import com.linus.es.demo.vo.SearchVO;
 import com.linus.es.demo.vo.SimpleStringSearchVO;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * @author yuxuecheng
@@ -188,11 +195,12 @@ public class ElasticDataController {
 
     /**
      * bool查询入口。
-     * 支持AND、OR和NOT，可以是大写或小写单词，单词两边要有空格和中文分开
-     * 运算符优先级，从高到低依次为NOT、AND、OR，可以使用括号来改变运算词序
+     * 支持&（AND）、|（OR）和!（NOT）
+     * 运算符优先级，从高到低依次为!、&、|，可以使用括号来改变运算词序
      * 例如：
-     * 华法林 AND 肌钙蛋白
-     * 达比加群 NOT 华法林
+     * 华法林&肌钙蛋白
+     * 达比加群!华法林
+     * (达比加群|华法林)&肌钙蛋白
      * @param index 搜索的索引名
      * @param text 布尔搜索文本
      * @return 搜索结果
@@ -202,10 +210,10 @@ public class ElasticDataController {
         log.info("enter boolSearch");
         ResponseResult<String> response = new ResponseResult<>();
         ElasticQueryBuilderUtil queryBuilderTools = new ElasticQueryBuilderUtil(searchAnalyzer);
-        NestedQueryBuilder diagNestedQueryBuilder = queryBuilderTools.buildDiagnosisQueryBuilder(text);
+        Queue<String> formalizedText = BoolExpressionParser.convert(text);
+        log.info("输入搜索字符串：" + text + "，格式化后字符串：" + formalizedText);
+        BoolQueryBuilder boolQueryBuilder = queryBuilderTools.buildBoolQueryBuilder(formalizedText, allFields);
 
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        boolQueryBuilder.must(diagNestedQueryBuilder);
         SearchSourceBuilder searchSourceBuilder = ElasticUtil.initSearchSourceBuilder(boolQueryBuilder, 0, 100, 2000, 0.5f);
         String searchResult = baseElasticDao.searchReturnHits(index, searchSourceBuilder);
         log.info(searchResult);

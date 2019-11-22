@@ -6,6 +6,7 @@ import org.elasticsearch.index.query.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * @author yuxuecheng
@@ -158,6 +159,65 @@ public class ElasticQueryBuilderUtil {
         boolQueryBuilder.should(operationQueryBuilder);
         boolQueryBuilder.should(multiMatchQueryBuilder);
 
+        return boolQueryBuilder;
+    }
+
+    /**
+     * 搜索手游文本的查询对象
+     * @param searchText 搜索文本
+     * @return bool查询对象
+     */
+    public BoolQueryBuilder buildBoolQueryBuilder(Queue<String> searchText, String fields) throws IllegalArgumentException {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        String keyword = "";
+        while(!searchText.isEmpty()) {
+            String word = searchText.peek();
+            if (!word.matches("[\\$\\&\\!\\|\\(\\)]")) {
+                searchText.poll();
+                keyword = word;
+            } else if (word.equalsIgnoreCase("&")) {
+                searchText.poll();
+                BoolQueryBuilder subQueryBuilder = buildAllQueryBuilder(keyword, fields);
+                boolQueryBuilder.must(subQueryBuilder);
+            } else if (word.equalsIgnoreCase("|")) {
+                searchText.poll();
+                BoolQueryBuilder subQueryBuilder = buildAllQueryBuilder(keyword, fields);
+                boolQueryBuilder.should(subQueryBuilder);
+            } else if (word.equalsIgnoreCase("!")) {
+                searchText.poll();
+                BoolQueryBuilder subQueryBuilder = buildAllQueryBuilder(keyword, fields);
+                boolQueryBuilder.mustNot(subQueryBuilder);
+            } else if (word.equalsIgnoreCase("(")) {
+                searchText.poll();
+                // 如果碰到左括号的则左括号的部分需要进行嵌入处理，并根据右括号后面的运算符和当前的运算进行合并
+                BoolQueryBuilder subQueryBuilder = buildBoolQueryBuilder(searchText, fields);
+                if (searchText.isEmpty() || !(searchText.peek().equalsIgnoreCase(")"))) {
+                    log.info("布尔搜索字符串格式错误");
+                    throw new IllegalArgumentException("布尔搜索字符串格式错误");
+                } else {
+                    // 弹出右括号
+                    searchText.poll();
+                    if (searchText.isEmpty() || !(searchText.peek().matches("[\\!\\&\\|]"))) {
+                        log.info("布尔搜索字符串格式错误");
+                        throw new IllegalArgumentException("布尔搜索字符串格式错误");
+                    }
+                    String operator = searchText.poll();
+                    if (operator.equalsIgnoreCase("&")) {
+                        boolQueryBuilder.must(subQueryBuilder);
+                    } else if (operator.equalsIgnoreCase("|")) {
+                        boolQueryBuilder.should(subQueryBuilder);
+                    } else if (operator.equalsIgnoreCase("!")) {
+                        boolQueryBuilder.mustNot(subQueryBuilder);
+                    } else {
+                        log.info("布尔搜索字符串格式错误");
+                        throw new IllegalArgumentException("布尔搜索字符串格式错误");
+                    }
+                }
+            } else if (word.equalsIgnoreCase(")")) {
+                // 碰到右括号则跳出循环，
+                break;
+            }
+        }
         return boolQueryBuilder;
     }
 }
