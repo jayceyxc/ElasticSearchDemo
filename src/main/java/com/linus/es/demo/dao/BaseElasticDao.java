@@ -2,6 +2,7 @@ package com.linus.es.demo.dao;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.linus.es.demo.entity.BatchInsertResult;
 import com.linus.es.demo.entity.ElasticEntity;
 import com.linus.es.demo.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -75,8 +76,11 @@ public class BaseElasticDao {
      */
     private void buildSetting(CreateIndexRequest request){
 
-        request.settings(Settings.builder().put("index.number_of_shards",3)
-                .put("index.number_of_replicas",2));
+        Settings.Builder builder = Settings.builder();
+        builder.put("index.number_of_shards",3);
+        builder.put("index.number_of_replicas",2);
+
+        request.settings(builder);
     }
 
     /**
@@ -393,22 +397,37 @@ public class BaseElasticDao {
      * @param idxName 索引名称
      * @param list 待插入数据列表
      */
-    public void insertBatch(String idxName, List<ElasticEntity> list) {
+    public BatchInsertResult insertBatch(String idxName, List<ElasticEntity> list) {
 
         BulkRequest request = new BulkRequest();
         list.forEach(item -> request.add(new IndexRequest(idxName).id(item.getId())
                 .source(JSON.toJSONString(item.getData()), XContentType.JSON)));
         try {
+            int successNum = 0;
+            int failureNum = 0;
             BulkResponse bulkResponse = restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
             for (BulkItemResponse response : bulkResponse) {
-                log.info(response.getFailureMessage());
-                log.info(response.getId());
+                if (!response.isFailed()) {
+                    log.info("插入成功。索引名称：" + idxName + "，数据ID：" + response.getId() + "， 更新结果：" + response.getResponse().getResult().name());
+                    successNum++;
+                } else {
+                    log.error("插入失败。索引名称：" + idxName + "，数据ID：" + response.getId() + "，失败原因：" + response.getFailureMessage());
+                    failureNum++;
+                }
             }
+            log.info("索引名称：" + idxName + "，插入成功 " + successNum + "条，插入失败：" + failureNum + "条。");
+            BatchInsertResult result =  new BatchInsertResult();
+            result.setFailedCount(failureNum);
+            result.setSuccessCount(successNum);
+
+            return result;
         } catch (ElasticsearchException ee) {
             log.error("数据插入失败", ee);
         } catch (IOException ioe) {
             log.error("IO异常", ioe);
         }
+
+        return new BatchInsertResult();
     }
 
     /**

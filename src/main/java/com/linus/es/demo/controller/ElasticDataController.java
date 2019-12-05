@@ -1,6 +1,7 @@
 package com.linus.es.demo.controller;
 
 import com.linus.es.demo.dao.BaseElasticDao;
+import com.linus.es.demo.entity.BatchInsertResult;
 import com.linus.es.demo.entity.ElasticEntity;
 import com.linus.es.demo.response.ResponseCode;
 import com.linus.es.demo.response.ResponseResult;
@@ -20,12 +21,10 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.objenesis.strategy.BaseInstantiatorStrategy;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author yuxuecheng
@@ -80,6 +79,33 @@ public class ElasticDataController {
             response.setMsg("服务忙，请稍后再试");
             response.setStatus(false);
             log.error("插入数据异常，metadataVo={},异常信息={}", elasticDataVo.toString(),e.getMessage());
+        }
+        return response;
+    }
+
+    @RequestMapping(value = "/bulk_add",method = RequestMethod.POST)
+    public ResponseResult<BatchInsertResult> bulkAdd(@RequestBody List<ElasticDataVO> elasticDataVoList){
+        ResponseResult<BatchInsertResult> response = new ResponseResult<>(new BatchInsertResult());
+        if (elasticDataVoList.isEmpty()) {
+            return response;
+        }
+        try {
+            String indexName = elasticDataVoList.get(0).getIdxName();
+            List<ElasticEntity> elasticEntityList = new ArrayList<>();
+            for (ElasticDataVO elasticDataVO : elasticDataVoList) {
+                ElasticEntity elasticEntity = new ElasticEntity();
+                elasticEntity.setId(elasticDataVO.getElasticEntity().getId());
+                elasticEntity.setData(elasticDataVO.getElasticEntity().getData());
+                elasticEntityList.add(elasticEntity);
+            }
+
+            BatchInsertResult insertResult = baseElasticDao.insertBatch(indexName, elasticEntityList);
+            response.setData(insertResult);
+        } catch (Exception e) {
+            response.setCode(ResponseCode.ERROR.getCode());
+            response.setMsg("服务忙，请稍后再试");
+            response.setStatus(false);
+            log.error("插入数据异常，metadataVo={},异常信息={}", elasticDataVoList.toString(), e.getMessage());
         }
         return response;
     }

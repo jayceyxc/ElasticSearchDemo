@@ -17,6 +17,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -29,6 +30,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -41,6 +43,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -53,6 +56,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -65,6 +69,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -77,6 +82,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -89,6 +95,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -106,6 +113,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -118,6 +126,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -130,6 +139,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -142,6 +152,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -154,6 +165,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -166,6 +178,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -177,37 +190,44 @@
     "identity_card_num":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "present_addr":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "home_telephone":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "mobile":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "work_unit_addr":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "registered_addr":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "contact_name":
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -220,6 +240,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -231,17 +252,20 @@
     "contact_addr":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "contact_mobile":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "admission_type":
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -259,6 +283,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -271,6 +296,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -283,6 +309,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -300,6 +327,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -312,6 +340,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -324,6 +353,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -336,6 +366,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -348,6 +379,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -360,6 +392,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -372,6 +405,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -384,6 +418,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -396,6 +431,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -408,6 +444,7 @@
     {
       "type": "text",
       "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
       "fields":
       {
         "raw":
@@ -419,92 +456,110 @@
     "chief_complaint":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "present_illness_history":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "past_medical_history":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "personal_history":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "marriage_history":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "menstrual_history":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "family_history":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "physical_examination":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "auxiliary_examination":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "medical_history_summary":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "primary_diagnosis":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "first_disease_course":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "daily_disease_course":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "operation_record":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "salvage_record":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "discharge_record":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "discharge_abstract":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "death_record":
     {
       "type": "text",
-      "analyzer": "ik_max_word"
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
     },
     "treatment_data":
     {
@@ -515,6 +570,7 @@
         {
           "type": "text",
           "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart",
           "fields":
           {
             "raw":
@@ -531,12 +587,14 @@
         "per_dose":
         {
           "type": "text",
-          "analyzer": "ik_max_word"
+          "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart"
         },
         "category":
         {
           "type": "text",
           "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart",
           "fields":
           {
             "raw":
@@ -556,6 +614,7 @@
         {
           "type": "text",
           "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart",
           "fields":
           {
             "raw":
@@ -577,12 +636,14 @@
             "result":
             {
               "type": "text",
-              "analyzer": "ik_max_word"
+              "analyzer": "ik_max_word",
+              "search_analyzer": "ik_smart"
             },
             "detailName":
             {
               "type": "text",
               "analyzer": "ik_max_word",
+              "search_analyzer": "ik_smart",
               "fields":
               {
                 "raw":
@@ -604,6 +665,7 @@
         {
           "type": "text",
           "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart",
           "fields":
           {
             "raw":
@@ -615,12 +677,14 @@
         "examination_result":
         {
           "type": "text",
-          "analyzer": "ik_max_word"
+          "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart"
         },
         "image_direction":
         {
           "type": "text",
-          "analyzer": "ik_max_word"
+          "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart"
         }
       }
     },
@@ -633,6 +697,7 @@
         {
           "type": "text",
           "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart",
           "fields":
           {
             "raw":
@@ -645,6 +710,7 @@
         {
           "type": "text",
           "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart",
           "fields":
           {
             "raw":
@@ -664,6 +730,7 @@
         {
           "type": "text",
           "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart",
           "fields":
           {
             "raw":
@@ -675,12 +742,14 @@
         "operation_date":
         {
           "type": "text",
-          "analyzer": "ik_max_word"
+          "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart"
         },
         "operation_code":
         {
           "type": "text",
           "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart",
           "fields":
           {
             "raw":
@@ -693,6 +762,7 @@
         {
           "type": "text",
           "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart",
           "fields":
           {
             "raw":

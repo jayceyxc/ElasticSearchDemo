@@ -174,7 +174,7 @@ public class EsSearchTest implements CommandLineRunner {
 //        log.info("手术查询结果：" + result);
 //        String result = testOfficeStat();
 //        log.info("科室查询结果：" + result);
-        String result = testDiagnosisDataSearch();
-        log.info("手术查询结果：" + result);
+//        String result = testDiagnosisDataSearch();
+//        log.info("手术查询结果：" + result);
     }
 }
