@@ -51,6 +51,11 @@ public class BoolExpressionParser {
             }
         }
 
+        if (stringBuilder.length() > 0) {
+            stringQueue.add(stringBuilder.toString());
+            stringBuilder.delete(0, stringBuilder.length());
+        }
+
         return stringQueue;
     }
 

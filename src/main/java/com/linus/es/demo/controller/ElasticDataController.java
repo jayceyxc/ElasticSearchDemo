@@ -21,7 +21,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.objenesis.strategy.BaseInstantiatorStrategy;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;

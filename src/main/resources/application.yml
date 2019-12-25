@@ -1,5 +1,7 @@
 es:
   host: 120.79.176.54
+#  host: 47.107.153.61
+#  host: 58.210.179.70
   port: 9200
   scheme: http
   # 单位ms
@@ -13,6 +15,7 @@ es:
   # ElasticSearch的用户名密码
   username: elastic
   password: elastic
+#  password: xinluo@123
   # 搜索时使用的分词算法
   search_analyzer: ik_smart
   # 原索引名称

@@ -267,7 +267,9 @@ public class ElasticUtil {
         HighlightBuilder highlightBuilder = new HighlightBuilder();
         if (highlightFields != null) {
             for (String field : highlightFields) {
-                highlightBuilder.field(field);
+                highlightBuilder.field(field)
+                        .preTags("<span style=\"color:red;font-weight:bold;font-size:15px;\">")
+                        .postTags("</span>");
             }
         }
         sourceBuilder.highlighter(highlightBuilder);
